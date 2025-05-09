@@ -109,25 +109,35 @@ public class SyntaxAnalyzer implements CompilerStage<List<LexicalAnalyzer.Token>
             return;
         }
 
-        // Check for proper expression structure
+        // Validate expression using grammar rules
         for (int i = 0; i < tokens.size(); i++) {
             LexicalAnalyzer.Token token = tokens.get(i);
-            
+
             if (i % 2 == 0) {
-                // Even positions should be identifiers or operators
-                if (!token.type.equals("IDENTIFIER") && !token.type.equals("OPERATOR")) {
+                // Even positions should be identifiers (R3, R4)
+                if (!token.type.equals("IDENTIFIER")) {
                     result.isValid = false;
-                    result.errors.add(String.format("Syntax error at line %d: Expected identifier or operator, got '%s'", 
+                    result.errors.add(String.format("Syntax error at line %d: Expected identifier, got '%s'", 
+                        token.lineNumber, token.value));
+                } else if (!token.value.matches("[A-Za-z]")) {
+                    result.isValid = false;
+                    result.errors.add(String.format("Syntax error at line %d: Invalid identifier '%s'", 
                         token.lineNumber, token.value));
                 }
             } else {
-                // Odd positions should be operators
-                if (!token.type.equals("OPERATOR")) {
+                // Odd positions should be operators (R2)
+                if (!token.type.equals("OPERATOR") || !token.value.matches("[+\\-*/]")) {
                     result.isValid = false;
                     result.errors.add(String.format("Syntax error at line %d: Expected operator, got '%s'", 
                         token.lineNumber, token.value));
                 }
             }
+        }
+
+        // Ensure the expression follows R1 (E → E)
+        if (tokens.size() % 2 == 0) {
+            result.isValid = false;
+            result.errors.add("Syntax error: Expression must end with an identifier");
         }
     }
 }

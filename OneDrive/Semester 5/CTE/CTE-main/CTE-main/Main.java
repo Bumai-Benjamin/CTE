@@ -79,7 +79,7 @@ public class Main {
     }
 
     // Process stages 4-7: ICR, Code Generation, Optimization, and Target Machine Code
-    private static void processLineThroughRemainingStages(
+    private static List<String> processLineThroughRemainingStages(
         List<LexicalAnalyzer.Token> tokens,
         IntermediateCodeGenerator icg,
         CodeGenerator cg,
@@ -102,12 +102,22 @@ public class Main {
             System.out.println("\n====== STAGE 6: CODE OPTIMIZATION (CO) ======");
             optimized.forEach(System.out::println);
 
+            // Debug: Compare Stage 5 and Stage 6 outputs
+            if (cgCode.equals(optimized)) {
+                System.out.println("DEBUG: Stage 5 and Stage 6 outputs are identical (no optimizations applied).");
+            } else {
+                System.out.println("DEBUG: Stage 6 applied optimizations.");
+            }
+
             // Stage 7: Convert to machine code
             List<String> binary = tmc.convertToBinary(optimized);
             System.out.println("\n====== STAGE 7: TARGET MACHINE CODE (TMC) ======");
             binary.forEach(System.out::println);
+
+            return optimized;
         } catch (Exception e) {
             System.out.println("Error during code generation: " + e.getMessage());
+            return Collections.emptyList();
         }
     }
 }

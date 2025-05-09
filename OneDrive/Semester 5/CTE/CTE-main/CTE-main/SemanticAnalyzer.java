@@ -44,11 +44,14 @@ public class SemanticAnalyzer implements CompilerStage<List<LexicalAnalyzer.Toke
 
         // Check for invalid symbols in tokens
         for (LexicalAnalyzer.Token token : tokens) {
-            if (token.value.contains("%") || token.value.contains("&") || 
-                token.value.contains("$") || token.value.contains("<") || 
-                token.value.contains(">")) {
+            if (token.value.matches("[\\%\\$\\&\\<\\>]")) {
                 result.isValid = false;
                 result.errors.add(String.format("Semantic error at line %d: Invalid symbol '%s'", 
+                    token.lineNumber, token.value));
+            }
+            if (token.value.matches("\\d+")) {
+                result.isValid = false;
+                result.errors.add(String.format("Semantic error at line %d: Numbers are not allowed '%s'", 
                     token.lineNumber, token.value));
             }
         }

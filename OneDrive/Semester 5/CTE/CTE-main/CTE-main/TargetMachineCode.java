@@ -60,7 +60,11 @@ public class TargetMachineCode implements CompilerStage<List<String>, List<Strin
                 binaryInstruction.append("0");
             }
 
-            binaryCode.add(binaryInstruction.toString());
+            // Add spaces for readability (group into 4-bit segments)
+            String formattedBinary = binaryInstruction.toString()
+                .replaceAll("(.{4})", "$1 ").trim();
+
+            binaryCode.add(formattedBinary);
         }
 
         return binaryCode;

@@ -58,7 +58,7 @@ public class LexicalAnalyzer implements CompilerStage<String, LexicalAnalyzer.Le
     }
 
     // Main analysis method that converts input string into tokens
-    public LexicalResult analyze(String line, int lineNumber) {
+    public LexicalResult analyze(String line, int lineNumber) { // Removed @Override
         LexicalResult result = new LexicalResult();
         int position = 0;
 
@@ -77,19 +77,17 @@ public class LexicalAnalyzer implements CompilerStage<String, LexicalAnalyzer.Le
                     result.tokens.add(new Token(part, "KEYWORD", lineNumber, position));
                 } else if (part.length() == 1 && Character.isLetter(part.charAt(0))) {
                     result.tokens.add(new Token(part, "IDENTIFIER", lineNumber, position));
-                } else if (part.matches("[a-z]+")) {
-                    result.tokens.add(new Token(part, "IDENTIFIER", lineNumber, position));
                 } else if (operators.contains(part.charAt(0)) && part.length() == 1) {
                     result.tokens.add(new Token(part, "OPERATOR", lineNumber, position));
                 } else if (symbols.contains(part.charAt(0)) && part.length() == 1) {
                     result.tokens.add(new Token(part, "SYMBOL", lineNumber, position));
-                } else if (invalidSymbols.contains(part.charAt(0)) || part.matches(".*[^a-zA-Z=;+\\-*/\\s].*")) {
-                    result.errors.add(String.format("Lexical error at line %d, position %d: Invalid character '%s'", 
+                } else if (invalidSymbols.contains(part.charAt(0))) {
+                    result.errors.add(String.format("Lexical error at line %d, position %d: Invalid symbol '%s'", 
                         lineNumber, position, part));
-                } else if (Character.isDigit(part.charAt(0))) {
-                    result.errors.add(String.format("Lexical error at line %d, position %d: Digits not allowed '%s'", 
+                } else if (part.matches("\\d+")) {
+                    result.errors.add(String.format("Lexical error at line %d, position %d: Numbers are not allowed '%s'", 
                         lineNumber, position, part));
-                } else if (keywords.stream().noneMatch(k -> k.equals(part)) && part.equalsIgnoreCase("write")) {
+                } else if (keywords.stream().noneMatch(k -> k.equals(part)) && part.matches("[A-Za-z]+")) {
                     result.errors.add(String.format("Lexical error at line %d, position %d: Misspelled keyword '%s'", 
                         lineNumber, position, part));
                 } else {
